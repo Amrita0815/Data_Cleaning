@@ -1,11 +1,5 @@
 -- Data Cleaning
 
--- CREATE TABLE world_layoffs.layoffs_staging 
--- LIKE world_layoffs.layoffs;
-
--- INSERT layoffs_staging 
--- SELECT * FROM world_layoffs.layoffs;
-
 -- 1. Remove Duplicates
 -- 2. Standerdize the Data
 -- 3. Null Values or blank values
@@ -112,10 +106,96 @@ SET company =  TRIM(company);
  SELECt DISTINCT industry
  FROM layoffs_staging2;
  
- select  	
- select  
+ select  distinct location
+FROM layoffs_staging;
+
+SELECT  DISTINCT  COUNTRY
+FROM layoffs_staging2
+ORDER BY 1;
+
+SELECT DISTINCT country, TRIM(TRAILING '.'  FROM country)
+FROM layoffs_staging2
+ORDER BY 1;
+
+UPDATE layoffs_staging2
+SET country = TRIM(TRAILING '.'  FROM country)
+WHERE country LIKE  'United States%';
+
+SELECT `date`,
+STR_TO_DATE(`date`, '%m/%d/%Y')
 FROM layoffs_staging2;
 
+UPDATE layoffs_staging2
+ SET `date` = STR_TO_DATE(`date`, '%m/%d/%Y');
+
+SELECT `date`
+FROM layoffs_staging2;
+
+SELECT *
+FROm layoffs_staging2
+WHERE total_laid_off IS NULL
+AND percentage_laid_off IS NULL;
+
+
+SELECT distinct industry
+FROm layoffs_staging2;
+
+
+ALTER TABLE layoffs_staging2
+MODIFY COLUMN `date` DATE;
+
+SELECT *
+FROM layoffs_staging2;
+
+SELECT *
+FROm layoffs_staging2
+WHERE industry IS NULL
+OR industry = '';
+
+
+SELECT *
+FROM layoffs_staging2
+WHERE company LIKE 'Bally%';
+
+SELECt *
+FROM layoffs_staging2 AS t1
+JOIN layoffs_staging2 AS t2
+ON t1.company = t2.company
+Where (t1.industry IS NULL OR t1.industry = '')
+AND t2.industry IS NOT NULL;
+
+
+UPDATE layoffs_staging2 AS t1
+JOIN layoffs_staging2 AS t2
+ON t1.company = t2.company
+SET t1.industry = t2.industry
+Where t1.industry IS NULL 
+AND t2.industry IS NOT NULL;
+
+UPDATE layoffs_staging2
+SET industry = null
+Where industry = '';
+
+SELECT *
+FROM layoffs_staging2;
+
+
+SELECT *
+FROm layoffs_staging2
+WHERE total_laid_off IS NULL
+AND percentage_laid_off IS NULL;
+
+
+DELETE 
+FROm layoffs_staging2
+WHERE total_laid_off IS NULL
+AND percentage_laid_off IS NULL;
+
+SELECT *
+FROM layoffs_staging2;
+
+ALTER TABLE layoffs_staging2
+DROP COLUMN row_num;
 
 
 
