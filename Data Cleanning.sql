@@ -19,15 +19,14 @@ FROM layoffs_staging;
 INSERT layoffs_staging
  SELECT *
  FROm layoffs;
- 
- 
+  
  SELECT *,
  ROW_NUMBER() OVER(
  PARTITION BY company, industry, total_laid_off, percentage_laid_off, `date`) as row_num
  FROM layoffs_staging;
  
  
- 
+  -- Remove Duplicates
  WITH duplicate_cte AS 
  (
  SELECT *,
@@ -45,8 +44,6 @@ SELECT *
  SELECT *
 FROM layoffs_staging
 WHERE company = 'Casper';
-
- 
 
  
  CREATE TABLE `layoffs_staging2` (
@@ -84,7 +81,7 @@ WHERE company = 'Casper';
  
  -- Standardizing data
  
- 
+  -- Removing the extra spaces 
 select  company, TRIM(company)
 FROM layoffs_staging2;
 
@@ -113,6 +110,8 @@ SELECT  DISTINCT  COUNTRY
 FROM layoffs_staging2
 ORDER BY 1;
 
+-- United States had a 2nd categories (United States and United States.) 
+-- removed the period at the end of the 2nd one. 
 SELECT DISTINCT country, TRIM(TRAILING '.'  FROM country)
 FROM layoffs_staging2
 ORDER BY 1;
@@ -136,22 +135,20 @@ FROm layoffs_staging2
 WHERE total_laid_off IS NULL
 AND percentage_laid_off IS NULL;
 
-
 SELECT distinct industry
 FROm layoffs_staging2;
-
 
 ALTER TABLE layoffs_staging2
 MODIFY COLUMN `date` DATE;
 
 SELECT *
-FROM layoffs_staging2;
-
+FROM layoffs_staging2
+ 
+- Removing the NUll Values
 SELECT *
 FROm layoffs_staging2
 WHERE industry IS NULL
 OR industry = '';
-
 
 SELECT *
 FROM layoffs_staging2
@@ -185,7 +182,7 @@ FROm layoffs_staging2
 WHERE total_laid_off IS NULL
 AND percentage_laid_off IS NULL;
 
-
+-- Delete Nulls in total_laid_off and percentage_laid_off
 DELETE 
 FROm layoffs_staging2
 WHERE total_laid_off IS NULL
@@ -194,6 +191,7 @@ AND percentage_laid_off IS NULL;
 SELECT *
 FROM layoffs_staging2;
 
+-- Removing row_num column
 ALTER TABLE layoffs_staging2
 DROP COLUMN row_num;
 
